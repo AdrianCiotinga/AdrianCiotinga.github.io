@@ -1,7 +1,0 @@
----
-layout: post
-title:  "Test post!"
-date:   2023-08-15 17:27:22 -0400
-categories: blog post
----
-Just a test for now!
