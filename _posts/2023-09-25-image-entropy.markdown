@@ -28,7 +28,7 @@ which expanded becomes
 
 Evaluating this gives the following:
 
-![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/eq2.PNG?raw=true "Equation 4")
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/eq4.PNG?raw=true "Equation 4")
 
 This confirms our assumption that a binary process indeed only contains a single bit of information. Now, let's return to our original question: how can we quantify the information in an image? To start with a simple case (and to not require conditional probability just yet!), assume that our image is a grayscale image. That is, each pixel takes a discrete integer value *x* in *A={0, 1, 2,..., 255}*. We can then create a discrete probability distribution to model the distribution of pixel values in the image (i.e., a histogram with 256 bins representing the probability that a pixel has a specific value) and compute the entropy of the grayscale image. Below is an image and its resulting histogram.
 
