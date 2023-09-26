@@ -14,22 +14,28 @@ The naïve approach is to compare the file size of an image file and a text file
 
 Information theory is the mathematical study of the storage, processing, and transmission of information. One of the questions it aims to answer is how much "information" a given process outcome has, which is called the *entropy* of the random variable. Intuitively, an outcome that is more common contains less information than an uncommon outcome, so I will try and illustrate this with an example. Imagine that you live in a place where it is sunny six days out of the week on average; then there is not much "information" to be gained by watching weather reports, as it is most likely going to be sunny the next day. However, consider instead that you live in a place where it is sunny roughly 50% of the time; this large uncertainty in the weather means that weather reports convey more useful information than if it was almost always sunny.
 
-With that informal example that hopefully gave some intuition out of the way, we now need to look at the formal definition of entropy. Named after Dr. Claude Shannon, Shannon entropy represents the lower limit for the size of data after being losslessly compressed, and can be thought of as how much information a piece of data contains. For a probability distribution $p(x)$ and discrete random variable $X$ which takes values from alphabet $A$, entropy can be calculated by the following equation:
+With that informal example that hopefully gave some intuition out of the way, we now need to look at the formal definition of entropy. Named after Dr. Claude Shannon, Shannon entropy represents the lower limit for the size of data after being losslessly compressed, and can be thought of as how much information a piece of data contains. For a probability distribution *p(x)* and discrete random variable *X* which takes values from alphabet *A*, entropy can be calculated by the following equation:
 
-$H(X) = -\sum_{x \in A}p(x)log_2[p(x)]$
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/eq1.PNG?raw=true "Equation 1")
 
 Thus, entropy is simply the sum of the negative log probability of values in the data weighted by the probability of such event occurring. Base 2 for the $log$ function is used to get the entropy in terms of bits. As a quick sanity check, we can compute the entropy of flipping a fair coin, which we expect to be exactly one bit since the value has a 50/50 chance of being either heads or tails: here, our alphabet $A$ is the set $\{heads, tails\}$, with $p(heads)=p(tails)=0.5$. Therefore, the above equation becomes:
 
-$H(coin)=-\sum_{x \in A}p(x)log_2[p(x)]=-\sum_{x \in \{heads, tails\}}p(x)log_2[p(x)]$, which expanded becomes
-$H(coin)=-p(heads)log_2[p(heads)]-p(tails)log_2[p(tails)]$.
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/eq2.PNG?raw=true "Equation 2")
+
+which expanded becomes
+
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/eq3.PNG?raw=true "Equation 3")
 
 Evaluating this gives the following:
 
-$H(coin)=-0.5*log_2(0.5)-0.5*log_2(0.5)=0.5+0.5=1$
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/eq2.PNG?raw=true "Equation 4")
 
 This confirms our assumption that a binary process indeed only contains a single bit of information. Now, let's return to our original question: how can we quantify the information in an image? To start with a simple case (and to not require conditional probability just yet!), assume that our image is a grayscale image. That is, each pixel takes a discrete integer value $x \in A=\{0, 1, 2,..., 255\}$. We can then create a discrete probability distribution to model the distribution of pixel values in the image (i.e., a histogram with 256 bins representing the probability that a pixel has a specific value) and compute the entropy of the grayscale image. Below is an image and its resulting histogram.
 
 
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/cat_grayscale.PNG?raw=true "Figure 1")
+
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/cat_histogram.PNG?raw=true "Figure 1")
 
 Figure 1: Image of a cat (grayscale) and the resulting histogram of pixel intensity values
 
@@ -40,7 +46,9 @@ As you've seen, it is straightforward to compute the entropy for a single random
 
 Unfortunately not. You may have noticed that the way we have been applying Shannon entropy does not take the spatial relationship between pixels into account, which is a problem. This is an issue because 2D images are inherently dependent on spatial relationships to convey information. For example, take the two images below which have the same number of black pixels: by the above method, they both have the same entropy of ~0.81 bits, but one of them clearly conveys more information than the other.
 
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/64.PNG?raw=true "Figure 2")
 
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/64_2.PNG?raw=true "Figure 2")
 
 Figure 2: 16x16 images that convey different information but have the same Shannon entropy
 
@@ -55,7 +63,11 @@ The first requirement is straightforward; image entropy should be based on the s
 
 With these requirements in mind, a promising approach is to look at the change in pixel values instead of the pixel values themselves when computing Shannon entropy. Intuitively, adjacent pixels that are different colors contain more information than adjacent pixels of the same color, and this assumption is already used in conjunction with computing image gradients to solve many problems in computer vision relying on edge detection. Thus, we can calculate the Shannon entropy for the magnitude of the gradient at each pixel of an image, which satisfies the spatial relationship requirement from earlier. This approach is intuitive, as changes in pixel values are easy to conceptualize as "information" in the sense that we want to measure. Lastly, this approach works for color images as well, satisfying the last of our requirements outlined above. Below is an image showing the entropy calculation for a few previous examples using our new approach:
 
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/cat_entropy.PNG?raw=true "Figure 3")
 
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/img1_entropy.PNG?raw=true "Figure 3")
+
+![Image](https://github.com/AdrianCiotinga/AdrianCiotinga.github.io/blob/main/_posts/2023-09-25-image-entropy/img2_entropy.PNG?raw=true "Figure 3")
 
 Figure 3: Some images and their associated entropy values. As you can see, the 16x16 images from before have different entropy values when calculating using this approach
 
